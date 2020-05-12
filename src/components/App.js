@@ -4,34 +4,15 @@ import { ReactComponent as UploadSvg } from "../img/upload-drop.svg";
 import { ReactComponent as CheckboxAnimated } from "../img/checkbox-animated.svg";
 import CryptoJS from "crypto-js";
 import Dropzone from "react-dropzone";
-import { Document, Page, pdfjs } from "react-pdf";
 import axios from "axios";
 import { verifyCredential } from "did-jwt-vc";
 import { Resolver } from "did-resolver";
 import { getResolver } from "ethr-did-resolver";
-import Web3 from "web3";
 import ReactJson from "react-json-view";
 
 import "./accordion.scss";
-
-const ENS_REGISTRY_PUBLIC_RESOLVER_ABI_JSON = require("../contracts/publicResolverAbi.json");
-const ENS_REGISTRY_PUBLIC_RESOLVER_ADDRESS =
-  "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41";
-const ENS_NODE =
-  "0x3442daf145b62820466398f343a5666abd6b41e9144476431b4360e0007a214e";
-const INFURA_URI = "https://mainnet.infura.io/v3/";
-const INFURA_PROJECT_ID = "f89f8f95ce6c4199849037177b155d08";
-
-const web3 = new Web3(
-  new Web3.providers.HttpProvider(INFURA_URI + INFURA_PROJECT_ID)
-);
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-
-const ensContract = new web3.eth.Contract(
-  JSON.parse(ENS_REGISTRY_PUBLIC_RESOLVER_ABI_JSON.result),
-  ENS_REGISTRY_PUBLIC_RESOLVER_ADDRESS
-);
+import Web3ContractUtil from "../util/Web3ContractUtil";
+import PdfPreview from "./PdfPreview";
 
 const providerConfig = {
   name: "rsk:testnet",
@@ -53,12 +34,10 @@ class App extends React.Component {
     subjectName: "",
     submitClicked: false,
     jwt: "",
-    numPages: null,
     iatDate: "",
     nbfDate: "",
     issuanceDate: "",
     expirationDate: "",
-    pageNumber: 1,
 
     verifiedVC: {},
   };
@@ -99,24 +78,15 @@ class App extends React.Component {
       return;
     }
 
-    console.log(verifiedVC);
-
     const iatDate = new Date(verifiedVC.payload.iat * 1000).toUTCString();
     const nbfDate = new Date(verifiedVC.payload.nbf * 1000).toUTCString();
-    const expirationDate = new Date(
-      verifiedVC.payload.vc.expirationDate
-    ).toUTCString();
-    const issuanceDate = new Date(
-      verifiedVC.payload.vc.issuanceDate
-    ).toUTCString();
+    const expirationDate = new Date(verifiedVC.payload.vc.expirationDate).toUTCString();
+    const issuanceDate = new Date(verifiedVC.payload.vc.issuanceDate).toUTCString();
 
     const signerDID = verifiedVC.signer.owner;
-    const signerName = await this.getTxtRecord(signerDID);
-    const subjectName = await this.getTxtRecord(
-      verifiedVC.payload.vc.credentialSubject.id
-    );
-    const jwtMD5 =
-      verifiedVC.payload.vc.credentialSubject.TexasNotary.documentHash;
+    const signerName = await Web3ContractUtil.getTextRecordByDID(signerDID);
+    const subjectName = await Web3ContractUtil.getTextRecordByDID(verifiedVC.payload.vc.credentialSubject.id);
+    const jwtMD5 = verifiedVC.payload.vc.credentialSubject.TexasNotary.documentHash;
 
     window.location.href = "#middle";
     window.vc = verifiedVC;
@@ -134,9 +104,7 @@ class App extends React.Component {
     this.setState({ jwtMD5 });
   };
 
-  onDocumentLoadSuccess = ({ numPages }) => {
-    this.setState({ numPages });
-  };
+
 
   fileToMd5 = async (file) => {
     return new Promise((resolve, reject) => {
@@ -150,10 +118,7 @@ class App extends React.Component {
     });
   };
 
-  getTxtRecord = async (didKey) => {
-    let res = await ensContract.methods.text(ENS_NODE, didKey).call();
-    return res;
-  };
+
 
   renderTitle() {
     return <h1>Texas Digital Notary Verification</h1>;
@@ -196,39 +161,7 @@ class App extends React.Component {
     if (files.length > 0) {
       const [oneFile] = [...files];
       return (
-        <div>
-          <Document
-            file={oneFile.preview}
-            onLoadSuccess={this.onDocumentLoadSuccess}
-          >
-            <Page pageNumber={this.state.pageNumber} />
-          </Document>
-          <p>
-            <a
-              href="#"
-              onClick={() => {
-                if (this.state.pageNumber - 1 >= 1) {
-                  this.setState({ pageNumber: this.state.pageNumber - 1 });
-                }
-              }}
-            >
-              {" "}
-              prev{" "}
-            </a>
-            Page {this.state.pageNumber} of {this.state.numPages}
-            <a
-              href="#"
-              onClick={() => {
-                if (this.state.pageNumber + 1 <= this.state.numPages) {
-                  this.setState({ pageNumber: this.state.pageNumber + 1 });
-                }
-              }}
-            >
-              {" "}
-              next{" "}
-            </a>
-          </p>
-        </div>
+        <PdfPreview fileURL={oneFile.preview}  />
       );
     } else {
       return <Fragment />;
