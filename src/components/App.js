@@ -9,6 +9,7 @@ import VerifiedDetail from './VerifiedDetail';
 
 import VerifiedCredentialUtil from "../util/VerifiedCredentialUtil";
 import HashingUtil from "../util/HashingUtil";
+import './App.scss';
 
 class App extends Component {
 
@@ -45,7 +46,7 @@ class App extends Component {
     const subjectName = await Web3ContractUtil.getTextRecordByDID(verifiedVC.payload.vc.credentialSubject.id);
     const jwtMD5 = verifiedVC.payload.vc.credentialSubject.TexasNotary.documentHash;
 
-    window.location.href = "#middle";
+    // window.location.href = "#middle";
     // window.vc = verifiedVC;
 
     this.setState({ iatDate, nbfDate, expirationDate, issuanceDate, decodedJwt: JSON.stringify(verifiedVC),

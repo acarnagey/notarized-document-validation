@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import * as PropTypes from 'prop-types';
 import VerifiedCredentialUtil from '../util/VerifiedCredentialUtil';
+import './VerifiedSummary.scss';
 
 class VerifiedSummary extends Component {
 

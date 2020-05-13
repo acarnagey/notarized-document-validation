@@ -4,9 +4,23 @@ import ReactJson from "react-json-view";
 import { ReactComponent as CheckboxAnimated } from "../img/checkbox-animated.svg";
 import VerifiedCredentialUtil from "../util/VerifiedCredentialUtil";
 import * as PropTypes from 'prop-types';
-import "./accordion.scss";
+import './VerifiedDetail.scss';
 
 class VerifiedDetail extends Component {
+
+  constructor(props) {
+    super(props);
+    this.myRef = React.createRef()
+  }
+
+  scrollToMyRef = () => window.scrollTo(0, this.myRef.current.offsetTop)
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.verifiedVC !== this.props.verifiedVC && this.props.verifiedVC && this.props.verifiedVC.jwt) {
+      console.log('we are here');
+      this.scrollToMyRef();
+    }
+  }
 
   renderImageHashMatches() {
     const { fileMD5, jwtMD5 } = { ...this.props };
@@ -248,7 +262,7 @@ class VerifiedDetail extends Component {
     return (
       <Fragment>
         {(verifiedVC && verifiedVC.jwt) && (
-          <div id="middle" className="row middle-section">
+          <div ref={this.myRef} id="middle" className="row middle-section">
             <div className="col"></div>
             <div className="col-9 text-center">{this.renderTabs()}</div>
             <div className="col"></div>
