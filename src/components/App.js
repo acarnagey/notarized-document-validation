@@ -16,7 +16,7 @@ class App extends Component {
   state = {
     fileMD5: "", jwtMD5: "", signerDID: "", signerName: "", subjectName: "",
     submitClicked: false, jwt: "", iatDate: "", nbfDate: "", issuanceDate: "",
-    expirationDate: "", verifiedVC: {}
+    expirationDate: "", verifiedVC: {}, isLoading: false
   };
 
   handleOnDrop = async (file) => {
@@ -25,6 +25,7 @@ class App extends Component {
   };
 
   handleFileSubmit = async (did) => {
+    this.setState({isLoading: true});
     const jwt = await DidResolverUtil.getJWTByDid(did);
     let verifiedVC;
     try {
@@ -32,7 +33,7 @@ class App extends Component {
       verifiedVC = await VerifiedCredentialUtil.getVerifiedCredential(jwt, resolver);
     } catch (e) {
       console.log(e);
-      this.setState({ error: e.message });
+      this.setState({ error: e.message, isLoading: false });
       return;
     }
 
@@ -50,18 +51,19 @@ class App extends Component {
     // window.vc = verifiedVC;
 
     this.setState({ iatDate, nbfDate, expirationDate, issuanceDate, decodedJwt: JSON.stringify(verifiedVC),
-      signerDID, jwt, verifiedVC, signerName, subjectName, jwtMD5});
+      signerDID, jwt, verifiedVC, signerName, subjectName, jwtMD5, isLoading: false});
   };
 
   render() {
     const { fileMD5, jwtMD5, signerDID, signerName, subjectName,
       verifiedVC, expirationDate, iatDate, nbfDate, issuanceDate,
-      decodedJwt } = { ...this.state };
+      decodedJwt, isLoading } = { ...this.state };
     return (
       <div className="container">
         <VerifiedForm
           handleOnDrop={this.handleOnDrop}
           handleFileSubmit={this.handleFileSubmit}
+          isLoading={isLoading}
         />
         <VerifiedSummary
           fileMD5={fileMD5} jwtMD5={jwtMD5} signerName={signerName} verifiedVC={verifiedVC}

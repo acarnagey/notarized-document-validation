@@ -1,4 +1,4 @@
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page, Outline, pdfjs } from "react-pdf";
 import React, { Component } from "react";
 import * as PropTypes from 'prop-types';
 
@@ -18,40 +18,36 @@ class PdfPreview extends Component {
     this.setState({ numPages });
   };
 
+  handlePageChange = (newPageNumber) => {
+    const {pageNumber, numPages} = {...this.state};
+    let setPageNumber = pageNumber;
+    if (newPageNumber > 0 && newPageNumber <= numPages) {
+      setPageNumber = newPageNumber;
+    }
+    this.setState({ pageNumber: setPageNumber });
+  };
+
   render() {
     const {fileURL} = {...this.props};
     const {pageNumber} = {...this.state};
     return (
-      <div>
+      <div className="pdf-container">
           <Document
+            title=""
             file={fileURL}
             onLoadSuccess={this.onDocumentLoadSuccess}
           >
-            <Page pageNumber={pageNumber} />
+            <Page
+              pageNumber={pageNumber}
+              // customTextRenderer={({ str, itemIndex }) => { return (<span>{str}</mark>) }}
+              height={650}
+            />
           </Document>
-          <p>
-            <span
-              onClick={() => {
-                if (pageNumber - 1 >= 1) {
-                  this.setState({ pageNumber: pageNumber - 1 });
-                }
-              }}
-            >
-              {" "}
-              prev{" "}
-            </span>
-            Page {pageNumber} of {this.state.numPages}
-            <span
-              onClick={() => {
-                if (this.state.pageNumber + 1 <= this.state.numPages) {
-                  this.setState({ pageNumber: this.state.pageNumber + 1 });
-                }
-              }}
-            >
-              {" "}
-              next{" "}
-            </span>
-          </p>
+          <div className="paginate">
+            <span className="prev" onClick={() => {this.handlePageChange(pageNumber - 1)}}>prev</span>
+            <span className="status">Page {pageNumber} of {this.state.numPages}</span>
+            <span className="next" onClick={() => this.handlePageChange(pageNumber + 1)}>next</span>
+          </div>
         </div>
     )
   }

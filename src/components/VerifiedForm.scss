@@ -8,6 +8,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    .did-input-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      #didInput {
+        font-size: 30px;
+        font-weight: 300;
+        max-width: 910px;
+        border: solid 1px #707070;
+      }
+      svg {
+        margin: 0 0 0 21.4px;
+        cursor: pointer;
+      }
+    }
   }
   img {
     position: absolute;
@@ -35,17 +51,50 @@
     margin-bottom: 27px;
   }
 
-  #didInput {
-    font-size: 30px;
-    font-weight: 300;
-    max-width: 910px;
-    border: solid 1px #707070;
+
+
+  .doc-loading-container {
+    display: flex;
+    justify-content: center;
+    background-color: #b6b6b6;
+    #bm-doc-loading {
+      width: 405px;
+      height: 405px;
+      background-color: #b6b6b6;
+    }
   }
+
 
   .dropzone-container {
     display: flex;
     justify-content: center;
-    margin-top: 41px;
+    margin-top: 12px;
+    .pdf-container {
+      height: 700px;
+      .react-pdf__Document {
+        .react-pdf__Page {
+          border: 13px solid #676767;
+        }
+      }
+      .paginate {
+        display: flex;
+        justify-content: center;
+        .prev {
+          cursor: pointer;
+          text-transform: capitalize;
+          color: #327495;
+        }
+        .status {
+          margin: 0 10px;
+        }
+        .next {
+          cursor: pointer;
+          text-transform: capitalize;
+          color: #327495;
+        }
+      }
+    }
+
     @include media-breakpoint-down(sm) {
       margin: 0;
       .dropzone-form {
@@ -84,16 +133,35 @@
       }
     }
 
+    .dropzone-form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 374px;
+      position: relative;
+
+      svg.dash-rect {
+        width: 100%;
+        height: 374px;
+        position: absolute;
+        .two {
+          height: -webkit-calc(374px - 2px);
+          height:    -moz-calc(374px - 2px);
+          height:         calc(374px - 2px);
+          width: -webkit-calc(100% - 2px);
+          width:    -moz-calc(100% - 2px);
+          width:         calc(100% - 2px);
+        }
+      }
+
     @include media-breakpoint-down(lg) {
-      .dropzone-form {
-        display: flex;
-        flex: 1;
+
         .upload-sm {
           display: none;
         }
         .upload {
-          background-color: white;
-          border: dashed 2px $warm-grey;
+          // background-color: white;
+          // border: dashed 2px $warm-grey;
           display: flex;
           flex-direction: column;
           flex: 1;
@@ -139,8 +207,8 @@
           display: none;
         }
         .upload {
-          background-color: white;
-          border: dashed 2px $warm-grey;
+          // background-color: white;
+          // border: dashed 2px $warm-grey;
           display: flex;
           flex-direction: column;
           flex: 1;
@@ -184,8 +252,8 @@
           display: none;
         }
         .upload {
-          background-color: white;
-          border: dashed 2px $warm-grey;
+          // background-color: white;
+          // border: dashed 2px $warm-grey;
           display: flex;
           flex-direction: column;
           flex: 1;
